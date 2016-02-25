@@ -1,7 +1,11 @@
 # Tarea-Java-Spring
 
+La aplicación principal y los servicios funcionan sobre un servidor tomcat embebido.
+
 Para la ejecución de los servicios y la aplicación principal es necesario ejecutar los siguientes
-comandos en una shell unix desde la raiz de cada proyecto:
+comandos en una shell unix o en la linea de comandos de windows(Es necesario tener java instalado).
+
+Desde la raiz de cada proyecto:
 
 1)	java -Dserver.port=8080 -jar build/libs/loginForm-0.1.0.jar
 
@@ -19,3 +23,5 @@ de los siguientes archivos .jar:
 Para compilar cada proyecto ejecutar el siguiente comando desde el directorio raiz de cada proyecto
 
   ./gradlew build
+  
+Nota: La aplicación soporta una imagen de con tamaño máximo de 1048576 bytes.
