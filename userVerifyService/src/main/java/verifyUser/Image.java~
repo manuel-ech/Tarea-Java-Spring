@@ -1,0 +1,28 @@
+package verifyUser;
+
+public class Login {
+
+    private String username;
+    private String image;
+
+    public Login() {
+        super();
+    }
+    
+    public Login(String username, String image) {
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+    
+    @Override
+    public String toString(){
+	    return getImage();
+    }
+}

@@ -1,0 +1,80 @@
+package login;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.http.HttpEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import javax.servlet.http.*;
+import org.apache.commons.fileupload.FileUploadException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.Base64Utils;
+import util.PropertiesUtil;
+
+@Controller
+public class LoginController {
+
+
+    @RequestMapping(value="/login", method=RequestMethod.GET)
+    public String loginForm(Model model) {
+        model.addAttribute("login", new Login());
+        return "login";
+    }
+    
+    //Función que recibe los datos del formulario de login
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<String> loginSubmit(@RequestParam("username") String username, @RequestParam("image") MultipartFile image, Model model, HttpServletResponse response) throws Exception {
+	
+	//Se crea una instancia de la clase Login, se transforma la imagen recibida en un string Base64
+	Login login = new Login(username, Base64Utils.encodeToString(image.getBytes()));
+	
+	RestTemplate restTemplate = new RestTemplate();
+
+	//Se obtiene la url del servicio de login
+	String urlString = PropertiesUtil.getPropValues("url.login.service").trim();
+	
+	//Se crea una instancia de la clase ObjectMapper de la biblioteca jackson
+	ObjectMapper objectMapper = new ObjectMapper();
+	
+	//Se configura el objectMapper para una mejor impresión del json
+	objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+	
+	//Se realiza el mapeo del objeto login a un string con contenido JSON
+	String requestJson = objectMapper.writeValueAsString(login);
+	
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+
+	HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+	
+	try{
+	    //Se realiza la llamada al servicio de login
+	    ResponseEntity<String> loginServiceResponse = restTemplate.exchange(urlString, HttpMethod.POST, entity, String.class);
+	    
+	    //Se retorna la respuesta del servicio de login
+	    return loginServiceResponse;
+	    
+	} catch (HttpClientErrorException e) {
+	    
+	    //Se captura la exepción en caso de error, y si el status code es 401 se retona el mensaje requerido.
+	    
+	    if (e.getStatusCode().value() == 401)
+		return new ResponseEntity<String> ("No Autorizado", HttpStatus.UNAUTHORIZED);
+	    else
+		return new ResponseEntity<String> (e.getStatusText(), e.getStatusCode());
+	}
+    }
+}
