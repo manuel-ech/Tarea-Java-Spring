@@ -24,4 +24,4 @@ Para compilar cada proyecto ejecutar el siguiente comando desde el directorio ra
 
   ./gradlew build
   
-Nota: La aplicación soporta una imagen de con tamaño máximo de 1048576 bytes.
+Nota: La aplicación soporta una imagen con tamaño máximo de 1048576 bytes.
